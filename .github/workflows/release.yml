@@ -26,4 +26,4 @@ jobs:
         username: ${{ secrets.ftp_user }}
         password: ${{ secrets.ftp_pass }}
         local-dir: ./
-        server-dir: /betbot/betbot-release/
+        server-dir: /var/www/betbot-release/
