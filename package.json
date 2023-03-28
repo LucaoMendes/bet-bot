@@ -1,0 +1,36 @@
+{
+  "name": "bet-bot",
+  "version": "1.0.0",
+  "description": "Telegram Bytewise Matcher solution",
+  "main": "index.js",
+  "scripts": {
+    "migrate": "npx sequelize-cli db:migrate",
+    "migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "patch": "npm version patch",
+    "patch:minor": "npm version minor",
+    "patch:major": "npm version major",
+    "build": "rimraf ./build && tsc",
+    "start": "node build/index.js",
+    "dev": "nodemon"
+  },
+  "author": "LucaoMendes",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.37.0",
+    "nodemon": "^2.0.22",
+    "rimraf": "^4.4.1",
+    "ts-node": "^10.9.1",
+    "tslint": "^6.1.3",
+    "typescript": "^5.0.2"
+  },
+  "dependencies": {
+    "axios": "^1.3.4",
+    "pg": "^8.10.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.30.0",
+    "telegraf": "^4.12.2"
+  }
+}
