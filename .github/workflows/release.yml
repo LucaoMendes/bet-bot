@@ -1,0 +1,29 @@
+on:
+  push:
+    branches:
+      - develop
+name: 🚀Deploy BetBot
+jobs:
+  deploy-master-job:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Atualizar Código
+      uses: actions/checkout@v2
+#     - name: Node.js 16.17.0
+#       uses: actions/setup-node@v2-beta
+#       with:
+#         node-version: "16.17.0"
+
+#     - name: 🔨 Build Projeto
+#       run: |
+#         npm install
+#         npm run build
+    - name: 📂 Sincronizando Arquivos
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0
+      with:
+        server: ${{ secrets.ftp_host }}
+        username: ${{ secrets.ftp_user }}
+        password: ${{ secrets.ftp_pass }}
+        local-dir: ./
+        server-dir: /betbot/betbot-release

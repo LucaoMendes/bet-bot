@@ -1,0 +1,22 @@
+on:
+  pull_request:
+    branches:
+      - develop
+name: 🔨 Build Pipeline Check
+jobs:
+  build:
+    name: 🎉 Build Check
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Atualizar Código
+      uses: actions/checkout@v2
+
+    - name: Node.js 16.17.0
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: "16.17.0"
+
+    - name: 🔨 Build Projeto
+      run: |
+        npm install
+        npm run build
