@@ -7,3 +7,6 @@ src/models/index.js
 src/database/migrations
 src/api/routers
 src/commands/index.ts
+src/middlewares/index.ts
+src/scenes/index.ts
+src/actions/index.ts
