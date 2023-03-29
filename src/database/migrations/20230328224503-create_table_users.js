@@ -10,22 +10,32 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: Sequelize.STRING,
-      chatId: {
-        type: Sequelize.STRING,
+      first_name: Sequelize.STRING,
+      last_name: Sequelize.STRING,
+      user_name: Sequelize.STRING,
+      active:{
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      admin:{
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      chat_id: {
+        type: Sequelize.BIGINT,
         unique: true,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE
       },
     })
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('sports')
+    await queryInterface.dropTable('users')
   }
 };
