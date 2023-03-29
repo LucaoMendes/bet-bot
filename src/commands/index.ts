@@ -11,6 +11,8 @@ fs
   })
   .forEach((file:any) => {
     const command = require(path.join(__dirname, file)).default
+    command.path = path.join(__dirname, file)
+    
     CommandCenter.registerCommand(command)    
   })
 

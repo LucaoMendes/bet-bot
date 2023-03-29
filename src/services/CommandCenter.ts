@@ -21,6 +21,8 @@ export class CommandCenter {
 
     public static registerCommand(command: iCommand) {
         Logger.send(`Registrando comando ${command.command}`, LogType.INFO)
+        if(!command || !command.command || !command.description || !command.function)
+            return Logger.send(`Comando inválido ${JSON.stringify(command)}`,LogType.ERROR)
         this.commands.push(command)
     }
 
@@ -29,5 +31,9 @@ export class CommandCenter {
         if (command) {
             command.function(ctx)
         }
+    }
+
+    public static getCommands(): iCommand[] {
+        return this.commands
     }
 }

@@ -10,6 +10,7 @@ function startCommand(ctx:Context){
     ctx.reply('Bem vindo ' + ctx.from.first_name + '!')
 }
 const StartCommand:iCommand = {
+    description: 'Inicia a conversação',
     command: 'start',
     function: startCommand
 }
