@@ -1,6 +1,7 @@
 import { Context , Telegraf } from 'telegraf'
 import { message } from 'telegraf/filters'
 import { Update } from 'typegram'
+import { iAction } from '../interfaces/iAction'
 import { iCommand } from "../interfaces/iCommand"
 import { iMiddleware } from '../interfaces/iMiddleware'
 import Logger, { LogType } from "../utils/Logger"
@@ -8,6 +9,8 @@ import Logger, { LogType } from "../utils/Logger"
 export class CommandCenter {
     private static commands: iCommand[] = []
     private static middlewares: iMiddleware[] = []
+    private static actions: iAction[] = []
+
     private static bot: Telegraf<Context<Update>>
 
     public static init(){
@@ -26,6 +29,14 @@ export class CommandCenter {
         process.once('SIGTERM', () => this.bot.stop('SIGTERM'))
     }
 
+    public static registerAction(action: iAction) {
+        Logger.send(`Registrando ação ${action.name}`, LogType.INFO)
+
+        if(!action || !action.name || !action.description || !action.from || !action.function)
+            return Logger.send(`Ação inválida ${JSON.stringify(action)}`,LogType.ERROR)
+        
+        this.actions.push(action)
+    }
 
     public static registerMiddleware(middleware: iMiddleware) {
         Logger.send(`Registrando middleware ${middleware.name}`, LogType.INFO)
@@ -71,6 +82,10 @@ export class CommandCenter {
                 this.bot.use(middleware.function)
             })
 
+        this.actions.forEach(action => {
+            this.bot.action(action.name, action.function)
+        })
+        
         this.commands.forEach(command => {
             if(command.command === 'start') this.bot.start(command.function)
             else if(command.command === 'help') this.bot.help(command.function)
