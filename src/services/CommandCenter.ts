@@ -2,54 +2,38 @@ import { Context , Telegraf } from 'telegraf'
 import { message } from 'telegraf/filters'
 import { Update } from 'typegram'
 import { iCommand } from "../interfaces/iCommand"
-import User from '../models/User'
+import { iMiddleware } from '../interfaces/iMiddleware'
 import Logger, { LogType } from "../utils/Logger"
 
 export class CommandCenter {
     private static commands: iCommand[] = []
+    private static middlewares: iMiddleware[] = []
     private static bot: Telegraf<Context<Update>>
 
     public static init(){
         this.bot = new Telegraf(process.env.BOT_TOKEN as string)
 
-        this.bot.use(async (ctx, next) => {
-            if(!ctx.from) {
-                await ctx.reply("ERROR: Não foi possível obter o seus dados")
-                return
-            } 
+        //register commands,middlewares,actions,scenes,etc
+        this.recognizeComponents()        
 
-            console.time(`Tempo de resposta para [${ctx.from?.id}] ${ctx.from?.first_name}`)
-
-            const user = await User.findOne({where:{chat_id: ctx.from?.id}})
-
-            ctx.state.data = user?.dataValues
-
-            try{
-                await next()
-            }catch(e){
-                Logger.send(`Erro ${e}`, LogType.ERROR)
-            }
-
-            console.timeEnd(`Tempo de resposta para [${ctx.from?.id}] ${ctx.from?.first_name}`)
-        })
-
-        this.commands.forEach(command => {
-            if(command.command === 'start') this.bot.start(command.function)
-            else if(command.command === 'help') this.bot.help(command.function)
-            else this.bot.command(command.command, command.function)
-            
-        })
-
-        this.bot.action('/help', ctx => {
-            return ctx.answerCbQuery(`Oh, ${ctx.match[0]}! Great choice`)
-        })
-
+        //WTF msg function
         this.bot.on(message('text'),this.whatDidUSay)
         
+        //Start bot
         this.bot.launch()
 
         process.once('SIGINT', () => this.bot.stop('SIGINT'))
         process.once('SIGTERM', () => this.bot.stop('SIGTERM'))
+    }
+
+
+    public static registerMiddleware(middleware: iMiddleware) {
+        Logger.send(`Registrando middleware ${middleware.name}`, LogType.INFO)
+
+        if(!middleware || !middleware.name || !middleware.description || !middleware.function)
+            return Logger.send(`Middleware inválido ${JSON.stringify(middleware)}`,LogType.ERROR)
+
+        this.middlewares.push(middleware)
     }
 
     public static registerCommand(command: iCommand) {
@@ -78,5 +62,19 @@ export class CommandCenter {
 
     public static getCommands(): iCommand[] {
         return this.commands
+    }
+
+    private static recognizeComponents(){
+
+        this.middlewares.forEach(middleware => {
+            this.bot.use(middleware.function)
+        })
+
+        this.commands.forEach(command => {
+            if(command.command === 'start') this.bot.start(command.function)
+            else if(command.command === 'help') this.bot.help(command.function)
+            else this.bot.command(command.command, command.function)
+            
+        })
     }
 }
