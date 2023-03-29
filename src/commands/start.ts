@@ -37,7 +37,7 @@ async function startCommand(ctx:Context){
 
 const startCommandMarkupInlineButtons = Markup.inlineKeyboard([
                                             Markup.button.callback("Sim",'start-profile-config'),
-                                            Markup.button.callback("Não", 'break-callback'),
+                                            Markup.button.callback("Não", 'break-start-action'),
                                         ],)
 
 const StartCommand:iCommand = {
