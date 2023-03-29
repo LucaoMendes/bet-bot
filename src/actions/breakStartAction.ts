@@ -2,7 +2,7 @@ import { Context } from "telegraf"
 import { iAction } from "../interfaces/iAction"
 import Logger, { LogType } from "../utils/Logger"
 
-export async function breakStartAction(ctx:Context){
+async function breakStartAction(ctx:Context){
     if(!ctx.callbackQuery?.message)
         return Logger.send("ERROR: breakStartAction - ctx.callbackQuery?.message is undefined",LogType.ERROR)
 
