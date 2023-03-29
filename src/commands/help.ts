@@ -2,7 +2,7 @@ import { Context } from "telegraf"
 import { iCommand } from "../interfaces/iCommand"
 import { CommandCenter } from "../services/CommandCenter"
 
-function helpCommand(ctx:Context){
+async function helpCommand(ctx:Context){
     const commands = CommandCenter.getCommands()
 
     let message = 'Comandos disponíveis:\n'
@@ -10,7 +10,7 @@ function helpCommand(ctx:Context){
         message += `/${command.command} - ${command.description}\n`
     })
 
-    ctx.reply(message)
+    await ctx.reply(message)
 }
 const HelpCommand:iCommand = {
     description: 'Mostra os comandos disponíveis',
