@@ -65,10 +65,11 @@ export class CommandCenter {
     }
 
     private static recognizeComponents(){
-
-        this.middlewares.forEach(middleware => {
-            this.bot.use(middleware.function)
-        })
+        this.middlewares
+            .sort((a, b) => b.priority - a.priority)
+            .forEach(middleware => {
+                this.bot.use(middleware.function)
+            })
 
         this.commands.forEach(command => {
             if(command.command === 'start') this.bot.start(command.function)

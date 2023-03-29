@@ -27,5 +27,6 @@ const AuthMiddleware:iMiddleware = {
     name: 'authMiddleware',
     description: 'Responsável por realizar o reconhecimento e autorização do chat em questão',
     function: authMiddleware,
+    priority: 999
 }
 export default AuthMiddleware
