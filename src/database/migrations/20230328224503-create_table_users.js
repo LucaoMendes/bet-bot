@@ -10,10 +10,21 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: Sequelize.STRING,
-      chatId: {
+      first_name: Sequelize.STRING,
+      last_name: Sequelize.STRING,
+      user_name: Sequelize.STRING,
+      active:{
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      admin:{
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      chat_id: {
         type: Sequelize.STRING,
         unique: true,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
