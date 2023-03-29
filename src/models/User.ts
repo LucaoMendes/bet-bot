@@ -38,6 +38,7 @@ User.init(
         timestamps: true,
         updatedAt: false,
         sequelize: database.connection,
+        tableName: 'users',
     }
 )
 

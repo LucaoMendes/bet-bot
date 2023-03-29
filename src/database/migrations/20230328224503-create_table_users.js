@@ -22,7 +22,7 @@ module.exports = {
         defaultValue: false,
       },
       chat_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.BIGINT,
         unique: true,
         allowNull: false,
       },
@@ -31,12 +31,11 @@ module.exports = {
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE
       },
     })
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('sports')
+    await queryInterface.dropTable('users')
   }
 };
