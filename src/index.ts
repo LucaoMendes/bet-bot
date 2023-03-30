@@ -5,6 +5,7 @@ dotenv.config()
 import './commands'
 import './middlewares'
 import './actions'
+import './scenes'
 
 
 CommandCenter.init()
