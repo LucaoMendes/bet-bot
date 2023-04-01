@@ -13,7 +13,7 @@ async function authMiddleware(ctx:Context, next: () => Promise<void>){
 
     const user = await User.findOne({where:{chat_id: ctx.from?.id}})
 
-    ctx.state.data = user?.dataValues
+    ctx.state.user = user?.dataValues
 
     try{
         await next()

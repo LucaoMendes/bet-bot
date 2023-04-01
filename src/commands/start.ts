@@ -11,7 +11,7 @@ async function startCommand(ctx:Context){
         return
     }
     
-    if(ctx.state.data){
+    if(ctx.state.user){
         await ctx.reply(
             `Olá ${ctx.from.first_name}, tudo bem?`+
             `\nVocê já está cadastrado!` +
@@ -36,7 +36,7 @@ async function startCommand(ctx:Context){
 }
 
 const startCommandMarkupInlineButtons = Markup.inlineKeyboard([
-                                            Markup.button.callback("Sim",'start-profile-config'),
+                                            Markup.button.callback("Sim",'profile-config'),
                                             Markup.button.callback("Não", 'break-start-action'),
                                         ],)
 

@@ -1,6 +1,6 @@
 import { Context , Scenes, session, Telegraf } from 'telegraf'
 import { message } from 'telegraf/filters'
-import { WizardScene } from 'telegraf/typings/scenes'
+import { WizardContext, WizardScene, WizardSessionData } from 'telegraf/typings/scenes'
 import { iAction } from '../interfaces/iAction'
 import { iCommand } from "../interfaces/iCommand"
 import { iMiddleware } from '../interfaces/iMiddleware'
@@ -71,7 +71,7 @@ export class CommandCenter {
         this.commands.push(command)
     }
 
-    public static executeCommand(commandName: string, ctx: Context) {
+    public static executeCommand(commandName: string, ctx: WizardContext<WizardSessionData>) {
         Logger.send(`Executando comando ${commandName} para [${ctx.from?.id}] ${ctx.from?.first_name}`, LogType.INFO)
         const command:iCommand | undefined = this.commands.find(x => x.command === commandName)
 
