@@ -1,6 +1,7 @@
 import { Context } from "telegraf"
 import { iMiddleware } from "../interfaces/iMiddleware"
 import User from "../models/User"
+import UserProfile from "../models/UserProfile"
 import Logger, { LogType } from "../utils/Logger"
 
 async function authMiddleware(ctx:Context, next: () => Promise<void>){
@@ -12,8 +13,14 @@ async function authMiddleware(ctx:Context, next: () => Promise<void>){
     console.time(`Tempo de resposta para [${ctx.from?.id}] ${ctx.from?.first_name}`)
 
     const user = await User.findOne({where:{chat_id: ctx.from?.id}})
-
-    ctx.state.user = user?.dataValues
+    if(user){    
+        ctx.state.user = user?.dataValues
+        const userProfile = await UserProfile.findOne({where:{user_id: user?.id}})
+        ctx.state.userProfile = userProfile?.dataValues
+    }
+    
+    
+    
 
     try{
         await next()
