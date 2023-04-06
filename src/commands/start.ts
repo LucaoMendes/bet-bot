@@ -16,7 +16,9 @@ async function startCommand(ctx:Context){
             `Olá ${ctx.from.first_name}, tudo bem?`+
             `\nVocê já está cadastrado!` +
             `\nEnvie /help para ver os comandos disponíveis!` +
-            `\n\nDeseja configurar seu perfil de apostas para começar a receber minhas analises?`,
+            (ctx.state.userProfile ? 
+            `\n\nDeseja atualizar seu perfil de apostas?` : 
+            `\n\nDeseja configurar seu perfil de apostas para começar a receber minhas analises?`),
             startCommandMarkupInlineButtons)
         return
     }
