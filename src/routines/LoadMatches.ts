@@ -22,7 +22,7 @@ async function loadMatches() {
     await MatchController.saveAll(todayMatches)
 
     Logger.send(`Analisando ${tomorrowMatches.length} partidas de amanhã`,LogType.CRON)
-    await MatchController.saveAll(tomorrowMatches)
+    await MatchController.saveAll(tomorrowMatches,true)
 }
 
 const LoadMatches:iRoutine = {

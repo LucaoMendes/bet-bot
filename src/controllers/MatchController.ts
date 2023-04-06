@@ -1,7 +1,7 @@
 import { iSaveResponse } from "../interfaces/iSaveResponse"
 import Match from "../models/Match"
 import Logger, { LogType } from "../utils/Logger"
-import { validateMatches } from "../utils/MatchUtils"
+import { matchStatus, validateMatches } from "../utils/MatchUtils"
 
 export default class MatchController {
     static async save(match:any):Promise<iSaveResponse>{
@@ -22,7 +22,7 @@ export default class MatchController {
         return { status: 'error' }
     }
 
-    static async saveAll(matches:any[]){
+    static async saveAll(matches:any[],reviewMatches = false){
 
         const matchesReduced = await validateMatches(matches)
 
@@ -36,5 +36,27 @@ export default class MatchController {
         await Promise.all(promises)
 
         Logger.send(`Partidas salvas ${matchesReduced.length} de ${matches.length}`)
+
+        if(reviewMatches){
+            Logger.send(`Revisando partidas`,LogType.CRON)
+            await MatchController.reviewMatches(matches)
+        }
     }
+
+    private static async reviewMatches(matches: Match[]){
+        const ids = matches.map(match => match.id)
+        const matchesToReview = await Match.findAll({
+            where: {
+                status: matchStatus.IN_PROGRESS,
+            }
+        })
+
+        matchesToReview.forEach(async (match) => {
+            if(!ids.includes(match.id)){
+                Logger.send(`Partida ${match.id} não está mais no ao vivo, alterando status`,LogType.CRON)
+                await match.update({status: matchStatus.FINISHED})
+            }
+        })
+    }
+
 }
