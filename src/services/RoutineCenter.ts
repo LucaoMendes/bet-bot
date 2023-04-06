@@ -13,7 +13,15 @@ export class RoutineCenter {
             return
         }
         this.routines.forEach(routine => {
-            cron.schedule(routine.expression, routine.function)
+            if(!routine.active)
+                return
+            try{
+                routine.function()
+                cron.schedule(routine.expression, routine.function)
+            }catch(e){
+                Logger.send(`Erro ao criar rotina ${routine.name}`,LogType.ERROR)
+                Logger.send(JSON.stringify(e),LogType.ERROR)
+            }
         })
     }
 
