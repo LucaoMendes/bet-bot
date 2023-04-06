@@ -1,3 +1,4 @@
+import { Op } from "sequelize"
 import Match from "../models/Match"
 import User from "../models/User"
 import UserProfile from "../models/UserProfile"
@@ -65,3 +66,34 @@ export async function getMinMaxOddProfile(min = true): Promise<UserProfile>{
 
     return UserProfile.findOne(whereClause)
 }
+
+export async function getAllFromDate(startDate: Date){
+    const endDate = new Date(startDate)
+    endDate.setHours(23,59,59,999)
+
+    startDate.setHours(0,0,0,0)
+    const whereClause:any = {
+        where:{
+            start_at: {
+                [Op.between]: [startDate,endDate]
+            }
+        }
+    }
+
+    return Match.findAll(whereClause)
+}
+
+export const matchStatus  = {
+    FINISHED: 'finished',
+    IN_PROGRESS: 'inprogress',
+    NOT_STARTED: 'notstarted',
+    CANCELED: 'canceled',
+    POSTPONED: 'postponed',
+    DELAYED: 'delayed',
+    INTERRUPTED: 'interrupted',
+    SUSPENDED: 'suspended',
+    WILL_CONTINUE: 'willcontinue',
+    NEED_ATTENTION: 'needattention',
+    UNKNOWN: 'unknown',
+}
+
