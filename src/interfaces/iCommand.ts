@@ -1,8 +1,8 @@
-import { Context } from 'telegraf'
+import { WizardContext, WizardSessionData } from 'telegraf/typings/scenes'
 
 export interface iCommand {
     path?: string
     description: string
     command: string
-    function: (ctx:Context) => void
+    function: ((ctx: WizardContext<WizardSessionData>) => Promise<void>)
 }

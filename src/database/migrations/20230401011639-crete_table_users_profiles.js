@@ -3,29 +3,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('users_profiles', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      first_name: Sequelize.STRING,
-      last_name: Sequelize.STRING,
-      user_name: Sequelize.STRING,
-      active:{
-        type: Sequelize.BOOLEAN,
-        defaultValue: true,
-      },
-      admin:{
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-      chat_id: {
-        type: Sequelize.BIGINT,
-        unique: true,
+      user_id: {
         allowNull: false,
+        type: Sequelize.INTEGER,
+        reference: 'users',        
+        unique: true,
       },
+      min_odd: Sequelize.DOUBLE,
+      max_odd: Sequelize.DOUBLE,
+      team_priority: Sequelize.STRING,
+      max_matches: Sequelize.INTEGER,
+      bet_value: Sequelize.DOUBLE,
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -37,6 +32,6 @@ module.exports = {
     })
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('users')
+    await queryInterface.dropTable('users_profiles')
   }
 };

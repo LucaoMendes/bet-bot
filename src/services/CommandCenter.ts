@@ -1,23 +1,29 @@
-import { Context , Telegraf } from 'telegraf'
+import { Context , Scenes, session, Telegraf } from 'telegraf'
 import { message } from 'telegraf/filters'
-import { Update } from 'typegram'
+import { WizardContext, WizardScene, WizardSessionData } from 'telegraf/typings/scenes'
 import { iAction } from '../interfaces/iAction'
 import { iCommand } from "../interfaces/iCommand"
 import { iMiddleware } from '../interfaces/iMiddleware'
+import { iScene } from '../interfaces/iScene'
 import Logger, { LogType } from "../utils/Logger"
 
 export class CommandCenter {
     private static commands: iCommand[] = []
     private static middlewares: iMiddleware[] = []
     private static actions: iAction[] = []
+    private static scenes: iScene[] = []
 
-    private static bot: Telegraf<Context<Update>>
+    private static bot: Telegraf<Scenes.WizardContext>
 
     public static init(){
-        this.bot = new Telegraf(process.env.BOT_TOKEN as string)
+        this.bot = new Telegraf<Scenes.WizardContext>(process.env.BOT_TOKEN as string)
+        
+        //SessionMiddleware
+        this.bot.use(session())
 
         //register commands,middlewares,actions,scenes,etc
-        this.recognizeComponents()        
+        this.recognizeComponents()    
+        
 
         //WTF msg function
         this.bot.on(message('text'),this.whatDidUSay)
@@ -27,6 +33,15 @@ export class CommandCenter {
 
         process.once('SIGINT', () => this.bot.stop('SIGINT'))
         process.once('SIGTERM', () => this.bot.stop('SIGTERM'))
+    }
+
+    public static registerScene(scene: iScene) {
+        Logger.send(`Registrando cena ${scene.name}`, LogType.INFO)
+
+        if(!scene || !scene.name || !scene.description || !scene.scene)
+            return Logger.send(`Cena inválida ${JSON.stringify(scene)}`,LogType.ERROR)
+        
+        this.scenes.push(scene)
     }
 
     public static registerAction(action: iAction) {
@@ -56,7 +71,7 @@ export class CommandCenter {
         this.commands.push(command)
     }
 
-    public static executeCommand(commandName: string, ctx: Context) {
+    public static executeCommand(commandName: string, ctx: WizardContext<WizardSessionData>) {
         Logger.send(`Executando comando ${commandName} para [${ctx.from?.id}] ${ctx.from?.first_name}`, LogType.INFO)
         const command:iCommand | undefined = this.commands.find(x => x.command === commandName)
 
@@ -76,6 +91,17 @@ export class CommandCenter {
     }
 
     private static recognizeComponents(){
+
+        const tempScenes = this.scenes.reduce<WizardScene<Scenes.WizardContext>[]>((acc, scene) => {
+            acc.push(scene.scene)
+            return acc
+        },[])
+
+        if(tempScenes.length > 0){
+            const stage = new Scenes.Stage(tempScenes)
+            this.bot.use(stage.middleware())
+        }        
+
         this.middlewares
             .sort((a, b) => b.priority - a.priority)
             .forEach(middleware => {
@@ -92,5 +118,6 @@ export class CommandCenter {
             else this.bot.command(command.command, command.function)
             
         })
+        
     }
 }

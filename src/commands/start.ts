@@ -11,12 +11,14 @@ async function startCommand(ctx:Context){
         return
     }
     
-    if(ctx.state.data){
+    if(ctx.state.user){
         await ctx.reply(
             `Olá ${ctx.from.first_name}, tudo bem?`+
             `\nVocê já está cadastrado!` +
             `\nEnvie /help para ver os comandos disponíveis!` +
-            `\n\nDeseja configurar seu perfil de apostas para começar a receber minhas analises?`,
+            (ctx.state.userProfile ? 
+            `\n\nDeseja atualizar seu perfil de apostas?` : 
+            `\n\nDeseja configurar seu perfil de apostas para começar a receber minhas analises?`),
             startCommandMarkupInlineButtons)
         return
     }
@@ -36,7 +38,7 @@ async function startCommand(ctx:Context){
 }
 
 const startCommandMarkupInlineButtons = Markup.inlineKeyboard([
-                                            Markup.button.callback("Sim",'start-profile-config'),
+                                            Markup.button.callback("Sim",'profile-config'),
                                             Markup.button.callback("Não", 'break-start-action'),
                                         ],)
 

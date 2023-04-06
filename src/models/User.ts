@@ -12,6 +12,7 @@ class User extends Model {
     public chat_id!: string
 
     public readonly createdAt!: Date
+    public readonly updatedAt!: Date
 }
 
 User.init(
@@ -36,7 +37,6 @@ User.init(
     },
     {
         timestamps: true,
-        updatedAt: false,
         sequelize: database.connection,
         tableName: 'users',
     }

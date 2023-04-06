@@ -1,4 +1,3 @@
-import { Op } from "sequelize"
 import { Context } from "telegraf"
 import { iSaveResponse } from "../interfaces/iSaveResponse"
 import User from "../models/User"
