@@ -20,6 +20,7 @@ module.exports = {
       max_odd: Sequelize.DOUBLE,
       team_priority: Sequelize.STRING,
       max_matches: Sequelize.INTEGER,
+      max_multiples: Sequelize.INTEGER,
       bet_value: Sequelize.DOUBLE,
       createdAt: {
         allowNull: false,

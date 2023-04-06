@@ -23,6 +23,18 @@ module.exports = {
           model: 'matches',
         },
       },
+      home_odd:{
+        type: Sequelize.DOUBLE,
+        allowNull: false,
+      },
+      draw_odd:{
+        type: Sequelize.DOUBLE,
+        allowNull: false,
+      },
+      away_odd:{
+        type: Sequelize.DOUBLE,
+        allowNull: false,
+      },
       notification_status:{
         type: Sequelize.STRING,
         allowNull: false,
