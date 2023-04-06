@@ -8,6 +8,7 @@ class UserProfile extends Model {
     public user_id!: number
     public min_odd!: number
     public max_odd!: number
+    public max_multiples!: number
     public team_priority!: string
     public max_matches!: number
     public bet_value!: number
@@ -32,6 +33,7 @@ UserProfile.init(
         },
         min_odd: DataTypes.INTEGER,
         max_odd: DataTypes.INTEGER,
+        max_multiples: DataTypes.INTEGER,
         team_priority: DataTypes.STRING,
         max_matches: DataTypes.INTEGER,
         bet_value: DataTypes.INTEGER,
