@@ -23,6 +23,10 @@ module.exports = {
           model: 'matches',
         },
       },
+      preview:{
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       home_odd:{
         type: Sequelize.DOUBLE,
         allowNull: false,

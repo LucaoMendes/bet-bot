@@ -8,6 +8,10 @@ class MultipleMatch extends Model {
     public multiple_id!: number
     public match_id!: number
     public notification_status!:iMultipleNotifications
+    public preview!: 'home_preview' | 'draw_preview' | 'away_preview'
+    public home_odd!: number
+    public draw_odd!: number
+    public away_odd!: number
     public cashout!: boolean
 
     public readonly startAt!: Date
@@ -34,6 +38,22 @@ MultipleMatch.init(
           references: {
             model: 'matches',
           },
+        },
+        preview:{
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        home_odd:{
+          type: DataTypes.DOUBLE,
+          allowNull: false,
+        },
+        draw_odd:{
+          type: DataTypes.DOUBLE,
+          allowNull: false,
+        },
+        away_odd:{
+          type: DataTypes.DOUBLE,
+          allowNull: false,
         },
         notification_status:{
           type: DataTypes.STRING,
