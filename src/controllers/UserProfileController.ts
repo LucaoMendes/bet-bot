@@ -1,4 +1,3 @@
-import { Context } from "telegraf"
 import { WizardContext } from "telegraf/typings/scenes"
 import { iSaveResponse } from "../interfaces/iSaveResponse"
 import UserProfile from "../models/UserProfile"
