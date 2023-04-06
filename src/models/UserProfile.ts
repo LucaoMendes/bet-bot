@@ -11,6 +11,7 @@ class UserProfile extends Model {
     public team_priority!: string
     public max_matches!: number
     public bet_value!: number
+    public user ?: User
 
     public readonly createdAt!: Date
     public readonly updatedAt!: Date
@@ -43,7 +44,7 @@ UserProfile.init(
     }
 )
 
-UserProfile.belongsTo(User, {foreignKey: 'id'})
+UserProfile.belongsTo(User, {foreignKey: 'user_id', as: 'user'})
 
 UserProfile.addHook('afterCreate', (userProfile:UserProfile) => {
     Logger.send(`Perfil de apostador adicionado: ${JSON.stringify(userProfile)}`, LogType.INFO)
