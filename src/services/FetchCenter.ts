@@ -1,12 +1,9 @@
 import axios from "axios"
 import { iDateMatches } from "../interfaces/iFetchResponses"
 import Match from "../models/Match"
-import Logger from "../utils/Logger"
 
 export class FetchCenter {
     private static BASE_URL = 'http://api.stcesporte.com'
-    
-
 
     public static async getDateMatches(date: string, page = 1, perPage = 50): Promise<Match[]> {
 
@@ -18,6 +15,13 @@ export class FetchCenter {
             return json.data
         }
         return [...json.data, ...(await this.getDateMatches(date, json.pager.page + 1, 100))]
+    }
+
+    public static async getLiveMatches(): Promise<Match[]> {
+        const path = `/matches/live`        
+        const json = await this.get<Match[]>(path) 
+
+        return json
     }
 
     private static async get<T>(path: string): Promise<T> {
