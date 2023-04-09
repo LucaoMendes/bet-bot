@@ -1,7 +1,9 @@
+import { Op } from "sequelize"
 import { iSaveResponse } from "../interfaces/iSaveResponse"
 import Match from "../models/Match"
 import Logger, { LogType } from "../utils/Logger"
-import { matchStatus, validateMatches } from "../utils/MatchUtils"
+import { eMatchStatus, validateMatches } from "../utils/MatchUtils"
+import { FetchCenter } from "../services/FetchCenter"
 
 export default class MatchController {
     static async save(match:any):Promise<iSaveResponse>{
@@ -21,8 +23,15 @@ export default class MatchController {
         }
         return { status: 'error' }
     }
+    static async saveAllWithoutValidation(matches:any[]){
+        const promises: Promise<any>[] = []
+        
+        matches.forEach((match:any) => promises.push(Match.upsert(match)))
 
-    static async saveAll(matches:any[],reviewMatches = false){
+        await Promise.all(promises)
+
+    }
+    static async saveAll(matches:any[],analyzeMatches = false){
 
         const matchesReduced = await validateMatches(matches)
 
@@ -30,33 +39,41 @@ export default class MatchController {
             return
         
         const promises: Promise<any>[] = []
-
-        matchesReduced.forEach((match) => promises.push(Match.upsert({...match})))
+        
+        matchesReduced.forEach((match:any) => promises.push(Match.upsert(match)))
 
         await Promise.all(promises)
 
-        Logger.send(`Partidas salvas ${matchesReduced.length} de ${matches.length}`)
-
-        if(reviewMatches){
-            Logger.send(`Revisando partidas`,LogType.CRON)
-            await MatchController.reviewMatches(matches)
-        }
+        if(analyzeMatches)
+            this.analyzeMatches(matchesReduced)
     }
 
-    private static async reviewMatches(matches: Match[]){
-        const ids = matches.map(match => match.id)
+    static async analyzeMatches(matchesSaved:Match[]){
+        const matchIds = matchesSaved.map((match) => match.id)
+
         const matchesToReview = await Match.findAll({
             where: {
-                status: matchStatus.IN_PROGRESS,
+                status: [eMatchStatus.IN_PROGRESS,eMatchStatus.NOT_STARTED],
+                start_at :{
+                    [Op.lt]: new Date()
+                },
+                id:{
+                    [Op.notIn]: matchIds
+                }
             }
         })
 
-        matchesToReview.forEach(async (match) => {
-            if(!ids.includes(match.id)){
-                Logger.send(`Partida ${match.id} não está mais no ao vivo, alterando status`,LogType.CRON)
-                await match.update({status: matchStatus.FINISHED})
-            }
+        if(matchesToReview.length == 0)
+            return
+
+        const promises: Promise<any>[] = []
+
+        matchesToReview.forEach(match => {
+            promises.push(
+                FetchCenter.getMatchById(match.id)
+                    .then(async fetchedMatch => await MatchController.save(fetchedMatch))
+            )
         })
+        
     }
-
 }
