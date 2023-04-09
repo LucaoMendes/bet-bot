@@ -1,20 +1,25 @@
 import { Model , DataTypes } from 'sequelize'
 import database from '../database'
 import Logger from '../utils/Logger'
-import { iMultipleNotifications } from '../interfaces/iMultipleNotifications'
+import Match from './Match'
+import Multiple from './Multiple'
+import { eMatchStatus } from '../utils/MatchUtils'
 
 class MultipleMatch extends Model { 
     public id!: number
     public multiple_id!: number
     public match_id!: number
-    public notification_status!:iMultipleNotifications
-    public preview!: 'home_preview' | 'draw_preview' | 'away_preview'
+    public score!: any
     public home_odd!: number
     public draw_odd!: number
     public away_odd!: number
-    public cashout!: boolean
+    public preview!: string
+    public result!: string
+    public status!: eMatchStatus
+    public match?: Match
 
     public readonly startAt!: Date
+    public readonly createdAt!: Date
     public readonly updatedAt!: Date
 }
 
@@ -32,16 +37,13 @@ MultipleMatch.init(
             model: 'multiples',
           },
         },
+        score:DataTypes.JSON,
         match_id:{
           type: DataTypes.INTEGER,
           allowNull: false,
           references: {
             model: 'matches',
           },
-        },
-        preview:{
-          type: DataTypes.STRING,
-          allowNull: false,
         },
         home_odd:{
           type: DataTypes.DOUBLE,
@@ -55,15 +57,17 @@ MultipleMatch.init(
           type: DataTypes.DOUBLE,
           allowNull: false,
         },
-        notification_status:{
+        preview:{
           type: DataTypes.STRING,
           allowNull: false,
-          defaultValue: 'multiple_created',
         },
-        cashout:{
-          type: DataTypes.BOOLEAN,
+        result:{
+          type: DataTypes.STRING,
           allowNull: false,
-          defaultValue: false,
+        },
+        status:{
+          type: DataTypes.STRING,
+          allowNull: false,
         },
         startAt:{
           type: DataTypes.DATE,
@@ -73,9 +77,18 @@ MultipleMatch.init(
     {
         timestamps: true,
         sequelize: database.connection,
-        modelName: 'multiples'
+        modelName: 'multiples_matches'
     }
 )
+
+MultipleMatch.belongsTo(Match,{
+  foreignKey: 'match_id'
+})
+
+Multiple.hasMany(MultipleMatch,{
+  foreignKey: 'multiple_id',
+  as: 'matches'
+})
 
 MultipleMatch.addHook(
     'beforeSave',

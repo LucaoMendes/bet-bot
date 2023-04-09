@@ -2,6 +2,7 @@ import { Model , DataTypes } from 'sequelize'
 import database from '../database'
 import Logger, { LogType } from '../utils/Logger'
 import User from './User'
+import Multiple from './Multiple'
 
 class UserProfile extends Model { 
     public id!: number
@@ -46,7 +47,20 @@ UserProfile.init(
     }
 )
 
-UserProfile.belongsTo(User, {foreignKey: 'user_id', as: 'user'})
+UserProfile.belongsTo(User, {
+    foreignKey: 'user_id', 
+    as: 'user'
+})
+
+UserProfile.hasMany(Multiple,{
+    foreignKey: 'user_profile_id',
+    as: 'multiples'
+})
+
+Multiple.belongsTo(UserProfile,{
+    foreignKey: 'user_profile_id',
+    as: 'profile'
+})
 
 UserProfile.addHook('afterCreate', (userProfile:UserProfile) => {
     Logger.send(`Perfil de apostador adicionado: ${JSON.stringify(userProfile)}`, LogType.INFO)

@@ -1,32 +1,33 @@
 import { Model , DataTypes } from 'sequelize'
 import database from '../database'
 import Logger from '../utils/Logger'
+import { eMatchStatus } from '../utils/MatchUtils'
 
 class Match extends Model { 
     public id!: number
     public sport_id!: number
     public name!: string
     public slug!: string
-    public time_details !: JSON
+    public time_details !: any
     public home_team_id!: number
-    public home !: JSON
+    public home !: any
     public away_team_id!: number
-    public away !: JSON
+    public away !: any
     public league_id!: number
-    public league !: JSON
+    public league !: any
     public challenge_id!: number
-    public challenge !: JSON
+    public challenge !: any
     public season_id!: number
-    public season !: JSON
-    public status!: string
+    public season !: any
+    public status!: eMatchStatus
     public status_more!: string
     public start_at!: Date
     public priority!: number
-    public home_score!: JSON
-    public away_score!: JSON
+    public home_score!: any
+    public away_score!: any
     public winner_code!: number
     public round_number!: number
-    public main_odds!: JSON
+    public main_odds!: any
 
     public readonly createdAt!: Date
     public readonly updatedAt!: Date
@@ -75,7 +76,7 @@ Match.init(
 Match.addHook(
     'beforeSave',
     async(match:Match): Promise<void> => {
-        Logger.send(`Adicionando Partida: ${match.id}`)
+        // Logger.send(`Adicionando Partida: ${match.id}`)
     }
 )
 
