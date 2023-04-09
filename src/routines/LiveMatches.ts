@@ -12,7 +12,7 @@ async function liveMatches(){
     if(liveMatches.length == 0)
         return
 
-    await MatchController.saveAll(liveMatches)
+    await MatchController.saveAll(liveMatches,true)
 }
 
 const LiveMatches:iRoutine = {

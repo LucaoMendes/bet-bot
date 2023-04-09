@@ -19,7 +19,7 @@ async function loadMatches() {
     Logger.send(`Carregados ${todayMatches.length} jogos para hoje e ${tomorrowMatches.length} jogos para amanhã`,LogType.CRON)
     
     Logger.send(`Analisando ${todayMatches.length} partidas de hoje`,LogType.CRON)
-    await MatchController.saveAll(todayMatches)
+    await MatchController.saveAll(todayMatches,true)
 
     Logger.send(`Analisando ${tomorrowMatches.length} partidas de amanhã`,LogType.CRON)
     await MatchController.saveAll(tomorrowMatches,true)
@@ -29,7 +29,7 @@ const LoadMatches:iRoutine = {
     name: 'LoadMatches',
     description: 'Realiza o carregamento das partidas do dia',
     expression: '0 * * * *',
-    active: false,
+    active: true,
     function: loadMatches
 }
 
