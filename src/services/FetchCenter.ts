@@ -1,6 +1,7 @@
 import axios from "axios"
 import { iDateMatches } from "../interfaces/iFetchResponses"
 import Match from "../models/Match"
+import Logger, { LogType } from "../utils/Logger"
 
 export class FetchCenter {
     private static BASE_URL = 'http://api.stcesporte.com'
@@ -17,6 +18,13 @@ export class FetchCenter {
         return [...json.data, ...(await this.getDateMatches(date, json.pager.page + 1, 100))]
     }
 
+    public static async getMatchById(id: number): Promise<Match> {
+        const path = `/matches/${id}`
+        const json = await this.get<Match>(path)
+
+        return json
+    }
+
     public static async getLiveMatches(): Promise<Match[]> {
         const path = `/matches/live`        
         const json = await this.get<Match[]>(path) 
@@ -25,8 +33,15 @@ export class FetchCenter {
     }
 
     private static async get<T>(path: string): Promise<T> {
-        const response = await axios.get(`${this.BASE_URL}/${path}`)
-        const json = response.data as T
-        return json
+        try{
+            const response = await axios.get(`${this.BASE_URL}${path}?bws`,{
+                timeout: 100000,
+            })
+            const json = response.data as T
+            return json
+        }catch(e){
+            Logger.send(`ERRO ao fetch ${path} - ${e}`,LogType.ERROR)
+            return this.get(path)
+        }
     }
 }
