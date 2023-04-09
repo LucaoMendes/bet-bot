@@ -23,11 +23,41 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0
       },
+      multiple_odd: {
+        type: Sequelize.DOUBLE,
+        defaultValue: 1
+      },
       green: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
+      red: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      running: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      status:{
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'multiple_created',
+      },
+      cashout:{
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      startAt:{
+        type: Sequelize.DATE,
+        allowNull: false
+      },
       createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
       },

@@ -23,10 +23,7 @@ module.exports = {
           model: 'matches',
         },
       },
-      preview:{
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
+      score:Sequelize.JSON,
       home_odd:{
         type: Sequelize.DOUBLE,
         allowNull: false,
@@ -39,21 +36,27 @@ module.exports = {
         type: Sequelize.DOUBLE,
         allowNull: false,
       },
-      notification_status:{
+      preview:{
         type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: 'multiple_created',
       },
-      cashout:{
-        type: Sequelize.BOOLEAN,
+      result:{
+        type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: false,
+      },
+      status: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       startAt:{
         type: Sequelize.DATE,
         allowNull: false,
       },
       createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
