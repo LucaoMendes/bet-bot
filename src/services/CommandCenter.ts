@@ -6,6 +6,7 @@ import { iCommand } from "../interfaces/iCommand"
 import { iMiddleware } from '../interfaces/iMiddleware'
 import { iScene } from '../interfaces/iScene'
 import Logger, { LogType } from "../utils/Logger"
+import User from '../models/User'
 
 export class CommandCenter {
     private static commands: iCommand[] = []
@@ -119,5 +120,13 @@ export class CommandCenter {
             
         })
         
+    }
+
+    public static async sendUserMessage(user:User, message:string){
+        try{
+            await this.bot.telegram.sendMessage(user.chat_id,message,{ parse_mode: 'HTML' , disable_web_page_preview: true})
+        }catch(e){
+            Logger.send(`Erro ao enviar mensagem para o usuário ${user.chat_id}\n --> ${JSON.stringify(e)}`,LogType.ERROR)
+        }
     }
 }
