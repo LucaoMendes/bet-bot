@@ -459,6 +459,7 @@ function checkMultipleInconsistencies(oldMultiple: Multiple,newMultiple: Multipl
             match_id:match.match_id,
             score: match.score,
             status: match.status,
+            match: match.match
         }
     })
 
@@ -467,13 +468,24 @@ function checkMultipleInconsistencies(oldMultiple: Multiple,newMultiple: Multipl
             match_id:match.match_id,
             score: match.score,
             status: match.status,
+            match: match.match
         }
     })
 
     const hasAnyMatchWithDivergency = oldMatchesDetails.some((oldMatch:any) => {
-        const newMatch = newMatchesDetails.find((newMatch:any) => newMatch.match_id == oldMatch.match_id)
-        return  newMatch?.score?.home !== oldMatch.score.home || 
-                newMatch?.score?.away !== oldMatch.score.away ||
+        const newMatch:any = newMatchesDetails.find((newMatch:any) => newMatch.match_id == oldMatch.match_id)
+        
+        if(!newMatch)
+            return false
+
+        return  (newMatch?.score && oldMatch.score ? 
+                    (
+                        newMatch.score.home !== oldMatch.score.home || 
+                        newMatch.score.away !== oldMatch.score.away 
+                    ) : 
+                    false 
+                ) ||
+                newMatch?.match?.status !== oldMatch.match?.status ||
                 newMatch?.status !== oldMatch.status
     })
     
