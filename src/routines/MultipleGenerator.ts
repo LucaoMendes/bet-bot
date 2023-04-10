@@ -8,19 +8,21 @@ import UserProfile from '../models/UserProfile'
 import Logger from '../utils/Logger'
 import { filterMatches, getAllFromDate, orderMatches } from '../utils/MatchUtils'
 import { calculateMultiple, getMatchDetails } from '../utils/MultipleUtils'
-import { CommandCenter } from '../services/CommandCenter'
 import MultipleController from '../controllers/MultipleController'
+import { MessageCenter } from '../services/MessageCenter'
 
 async function multipleGenerator(){
     const today = new Date()
-    
-    const matches = await getAllFromDate(today)
+    const tomorrow = new Date(today)
+
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    const todayMatches = await getAllFromDate(today)
+    const tomorrowMatches = await getAllFromDate(tomorrow)
 
     const profiles = await getAllProfiles()
 
     for(const profile of profiles){
-        const minOdd = profile.min_odd
-        const maxOdd = profile.max_odd
 
         const today0 = new Date()
         const today1 = new Date(today0)
@@ -28,7 +30,16 @@ async function multipleGenerator(){
         today0.setHours(0,0,0,0)
         today1.setHours(23,59,59,999)
 
-        const profileMultiples = await Multiple.findAll({
+        const tomorrow0 = new Date(today0)
+        const tomorrow1 = new Date(today1)
+
+        tomorrow0.setDate(tomorrow0.getDate() + 1)
+        tomorrow1.setDate(tomorrow1.getDate() + 1)
+
+        tomorrow0.setHours(0,0,0,0)
+        tomorrow1.setHours(23,59,59,999)
+
+        const profileMultiplesToday = await Multiple.findAll({
             where: {
                 user_profile_id: profile.id,
                 startAt:{
@@ -37,36 +48,57 @@ async function multipleGenerator(){
             }
         })
 
-        if(profileMultiples.length > 0){
-            Logger.send(`Para o perfil ${profile.user?.user_name} já foram gerados ${profileMultiples.length} multiplos hoje`)
-            continue
-            //Aqui realizar a checagem das múltiplas do dia para o perfil
+        const profileMultiplesTomorrow = await Multiple.findAll({
+            where: {
+                user_profile_id: profile.id,
+                startAt:{
+                    [Op.between]: [tomorrow0,tomorrow1]
+                }
+            }
+        })
+
+        if(profileMultiplesToday.length == 0 || (profileMultiplesToday.length < profile.max_multiples)){
+            generateMultiples(todayMatches,profileMultiplesToday,profile)
         }
-        
-        const matchesOrdered = orderMatches(filterMatches(matches, minOdd, maxOdd))
-
-        const calculatedMultiples = multiplePreview(matchesOrdered, profile)
-
-        Logger.send(`Para o perfil ${profile.user?.user_name} foram gerados ${calculatedMultiples.length} multiplos`)
-        
-
-        await MultipleController.saveAll(calculatedMultiples)
-        if(profile.user)
-            CommandCenter.sendUserMessage(profile.user,`Para o perfil ${profile.user?.user_name} foram gerados ${calculatedMultiples.length} multiplos`)
+        if(profileMultiplesTomorrow.length == 0 || (profileMultiplesTomorrow.length < profile.max_multiples)){
+            generateMultiples(tomorrowMatches,profileMultiplesTomorrow,profile)
+        }       
     }
 }
 
-function multiplePreview(matches: Match[],profile: UserProfile){
+async function generateMultiples(matches:Match[],actualMultiples: Multiple[],profile:UserProfile){
+    const minOdd = profile.min_odd
+    const maxOdd = profile.max_odd
+
+    const matchesOrdered = orderMatches(filterMatches(matches, minOdd, maxOdd))
+
+    const calculatedMultiples = await multiplePreview(matchesOrdered,actualMultiples,profile)
+
+    Logger.send(`Para o perfil ${profile.user?.user_name} foram gerados ${calculatedMultiples.length} multiplos`)
+    
+    if(calculatedMultiples.length > 0){
+        const savedMultiples = await MultipleController.saveAll(calculatedMultiples)
+
+        savedMultiples.data.forEach((multiple:Multiple) => MessageCenter.sendMultipleCreated(multiple))
+    }
+}
+
+async function multiplePreview(matches: Match[],actualMultiples: Multiple[],profile: UserProfile){
     const { max_matches , max_multiples } = profile
 
     const matchesInMultiples:number[] = []
     const multiples:Match[][] = []
+
+    const matchesInMultiplesSaved:number[] = actualMultiples?.map((multiple:any) => multiple?.matches?.map((match:any) => match.id)) ?? []
 
     for(let i = 0; i < max_multiples; i++) {
         const currentMultiple: Match[] = []
 
         for(let j = 0; j < matches.length; j++) {
             const match = matches[j]
+
+            if(matchesInMultiplesSaved.includes(match.id))
+                continue
 
             if(matchesInMultiples.includes(match.id) || currentMultiple.includes(match)) 
                 continue
@@ -78,7 +110,7 @@ function multiplePreview(matches: Match[],profile: UserProfile){
 
             if(profile.team_priority === 'away-priority' && details.preview !== 'away-priority') 
                 continue
-
+            
 
             currentMultiple.push(match)
             matchesInMultiples.push(match.id)
@@ -89,7 +121,7 @@ function multiplePreview(matches: Match[],profile: UserProfile){
             }
         }
 
-        if(multiples.length >= max_multiples) {
+        if(multiples.length + actualMultiples.length >= max_multiples) {
             break
         }
     }
@@ -127,7 +159,7 @@ const MultipleGenerator: iRoutine = {
     name: 'Multiple Generator',
     description: 'Analisa as partidas do dia e cria as múltiplas',
     active: true,
-    expression: '0 0 * * *',
+    expression: '* * * * *',
     function: multipleGenerator
 }
 export default MultipleGenerator
