@@ -34,14 +34,19 @@ export class FetchCenter {
 
     private static async get<T>(path: string): Promise<T> {
         try{
-            const response = await axios.get(`${this.BASE_URL}${path}?bws`,{
+            const response = await axios.get(`${this.BASE_URL}${path}${path.includes('?')?'&':'?'}bws`,{
                 timeout: 100000,
             })
             const json = response.data as T
             return json
         }catch(e){
             Logger.send(`ERRO ao fetch ${path} - ${e}`,LogType.ERROR)
+            await this.delay(1000)
             return this.get(path)
         }
+    }
+
+    private static async delay (ms: number) {
+        return  new Promise( resolve => setTimeout(resolve, ms) )
     }
 }
