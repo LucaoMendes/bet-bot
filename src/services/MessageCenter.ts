@@ -1,3 +1,4 @@
+import Multiple from "../models/Multiple"
 import { generateMultipleText, iMultiplesInconsistencies } from "../utils/MultipleUtils"
 import { CommandCenter } from "./CommandCenter"
 
@@ -11,5 +12,14 @@ export class MessageCenter {
 
 
         CommandCenter.sendUserMessage(data.profile.user,message)
-    }   
+    }
+    
+    static sendMultipleCreated(multiple: Multiple){
+        if(!multiple || !multiple.profile || !multiple.profile.user || 
+            !multiple.matches || multiple.matches.length == 0) return
+
+        const message = generateMultipleText(multiple)
+
+        CommandCenter.sendUserMessage(multiple.profile.user,message)
+    }
 }
