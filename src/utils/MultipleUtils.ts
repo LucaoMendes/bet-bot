@@ -161,8 +161,9 @@ export function getMatchDetails(match:Match){
     }
 }
 
-export async function getAllTodayMultiplesByUser(userProfile:UserProfile){
+export async function getAllMultiplesByUserPerDate(userProfile:UserProfile,plusDate = 0){
     const today0 = new Date()
+    today0.setDate(today0.getDate() + plusDate)
     const today1 = new Date(today0)
 
     today0.setHours(0,0,0,0)
@@ -224,13 +225,18 @@ export function generateMultipleText(multiple:Multiple,newMultiple:any = undefin
         Logger.send(`Multiple ${multiple.id} has no profile!`,LogType.ERROR)
         return `Múltipla não encontrada, verifique suas múltiplas com /multiples!`
     }
-    const orderedMatches = multiple.matches.sort((a,b) => {
-        if(!a.match || !b.match) return 0
-        const aDate = new Date(a.match.start_at)
-        const bDate = new Date(b.match.start_at)
-        return aDate.getTime() - bDate.getTime()
-    })
     
+    const orderMatches = (tempMultiple:any) => {
+        return tempMultiple.matches.sort((a:any,b:any) => {
+            if(!a.match || !b.match) return 0
+            const aDate = new Date(a.match.start_at)
+            const bDate = new Date(b.match.start_at)
+            return aDate.getTime() - bDate.getTime()
+        })
+    }
+
+    const orderedMatches = newMultiple ? orderMatches(newMultiple) : orderMatches(multiple)
+
    const {
             statusPt,
             returnValue,
