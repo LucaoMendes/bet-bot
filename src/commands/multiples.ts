@@ -1,6 +1,6 @@
 import { Context } from "telegraf"
 import { iCommand } from "../interfaces/iCommand"
-import { eMultipleStatus, extractMultipleDetailsToText, getAllTodayMultiplesByUser } from "../utils/MultipleUtils"
+import { eMultipleStatus, extractMultipleDetailsToText, getAllMultiplesByUserPerDate } from "../utils/MultipleUtils"
 import Multiple from "../models/Multiple"
 import UserProfile from "../models/UserProfile"
 
@@ -20,7 +20,32 @@ async function multiplesCommand(ctx: Context){
 
     const lastMessage = await ctx.reply(`Aguarde enquanto verifico suas múltiplas...`)
 
-    const multiples = await getAllTodayMultiplesByUser(userProfile)
+    const { text } : any = ctx.message
+
+    if(text.length > 0 && text.includes('tomorrow')){
+        const tomorrowMultiples = await getAllMultiplesByUserPerDate(userProfile,1)
+
+        if(tomorrowMultiples.length === 0){
+            await ctx.telegram.editMessageText(
+                                    lastMessage.chat.id,
+                                    lastMessage.message_id,
+                                    undefined,
+                                    `Você não possui múltiplas para amanhã!\n`
+                                    + `Verifique sua estratégia em /profile`)
+            return
+        }
+
+        await ctx.telegram.editMessageText(
+            lastMessage.chat.id,
+            lastMessage.message_id,
+            undefined,generateMultiplesText(tomorrowMultiples,userProfile),{
+            parse_mode: 'HTML'
+        })
+
+        return
+    }
+
+    const multiples = await getAllMultiplesByUserPerDate(userProfile)
 
     if(multiples.length === 0){
         await ctx.telegram.editMessageText(
