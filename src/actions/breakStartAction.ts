@@ -7,7 +7,7 @@ export async function breakStartAction(ctx:Context){
         return Logger.send("ERROR: breakStartAction - ctx.callbackQuery?.message is undefined",LogType.ERROR)
 
     // ctx.deleteMessage(ctx.callbackQuery?.message?.message_id)
-    ctx.editMessageText('Tudo bem...\nVocê pode retomar a conversa a qualquer momento enviando /start')
+    await ctx.editMessageText('Tudo bem...\nVocê pode retomar a conversa a qualquer momento enviando /start')
 }
 
 const BreakStartAction:iAction = {

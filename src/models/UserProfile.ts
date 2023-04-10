@@ -2,15 +2,18 @@ import { Model , DataTypes } from 'sequelize'
 import database from '../database'
 import Logger, { LogType } from '../utils/Logger'
 import User from './User'
+import Multiple from './Multiple'
 
 class UserProfile extends Model { 
     public id!: number
     public user_id!: number
     public min_odd!: number
     public max_odd!: number
+    public max_multiples!: number
     public team_priority!: string
     public max_matches!: number
     public bet_value!: number
+    public user ?: User
 
     public readonly createdAt!: Date
     public readonly updatedAt!: Date
@@ -31,6 +34,7 @@ UserProfile.init(
         },
         min_odd: DataTypes.INTEGER,
         max_odd: DataTypes.INTEGER,
+        max_multiples: DataTypes.INTEGER,
         team_priority: DataTypes.STRING,
         max_matches: DataTypes.INTEGER,
         bet_value: DataTypes.INTEGER,
@@ -43,7 +47,20 @@ UserProfile.init(
     }
 )
 
-UserProfile.belongsTo(User, {foreignKey: 'id'})
+UserProfile.belongsTo(User, {
+    foreignKey: 'user_id', 
+    as: 'user'
+})
+
+UserProfile.hasMany(Multiple,{
+    foreignKey: 'user_profile_id',
+    as: 'multiples'
+})
+
+Multiple.belongsTo(UserProfile,{
+    foreignKey: 'user_profile_id',
+    as: 'profile'
+})
 
 UserProfile.addHook('afterCreate', (userProfile:UserProfile) => {
     Logger.send(`Perfil de apostador adicionado: ${JSON.stringify(userProfile)}`, LogType.INFO)
